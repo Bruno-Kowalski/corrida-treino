@@ -21,6 +21,9 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Verificar estrutura
+        run: ls -la
+
       - name: Compilar projeto
         run: mvn clean compile
 
