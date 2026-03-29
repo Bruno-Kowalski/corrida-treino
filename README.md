@@ -1,58 +1,165 @@
-# 🏃 Corrida Treino
+# Corrida Treino
 
-> Plataforma inteligente de treinamento para corredores que oferece planos de treino personalizados e acompanhamento baseado em periodização científica.
+Plataforma de treinamento para corredores que gera planos personalizados com periodização científica.
 
-[![Versão](https://img.shields.io/badge/Vers%C3%A3o-1.0.0-blue)]()
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-green)]()
-[![Java](https://img.shields.io/badge/Java-21-blue)]()
-[![React](https://img.shields.io/badge/React-19.2.4-blue)]()
-[![License](https://img.shields.io/badge/License-MIT-yellow)]()
-[![GitHub Actions CI](https://github.com/seu_usuario/corrida-treino/workflows/CI%2FCD%20Pipeline/badge.svg?branch=main)]()
-[![Checkstyle](https://img.shields.io/badge/Checkstyle-Pass-brightgreen)]()
-[![ESLint](https://img.shields.io/badge/ESLint-Pass-brightgreen)]()
+## Problema Real
 
----
+Corredores amadores enfrentam dificuldade em estruturar treinos de forma eficaz, resultando em lesões, plateau de performance e falta de progresso. Muitos não sabem como organizar sua semana de treino.
 
-## 🎯 O Problema Real
+## Proposta da Solução
 
-### Contexto
-Corredores amadores e iniciantes frequentemente enfrentam a dificuldade de estruturar seus treinos de forma eficaz. Muitos treinam sem plano, o que resulta em:
-- **Lesões e overtraining** pela falta de variação de intensidade
-- **Plateau de performance** quando treino é desordenado
-- **Desmotivação** por falta de progresso mensurável
-- **Decisão paralisante**: "Como devo treinar essa semana?"
+Corrida Treino oferece uma plataforma que coleta o perfil do corredor (objetivo, nível, disponibilidade) e gera automaticamente planos de treino periodizados em 4 fases (Base, Desenvolvimento, Pico, Taper), com registro de execução e acompanhamento visual do progresso.
 
-### Público-Alvo
-- 🏃 Corredores amadores e iniciantes (nível básico a intermediário)
-- 👥 Pessoas que desejam melhorar performance em 5K, 10K ou Meia Maratona
-- 📊 Corredores que buscam organização, acompanhamento e suporte científico
-- 🎓 Estudantes e profissionais com rotina ocupada que precisam otimizar tempo de treino
+## Público-Alvo
 
-### Dor Específica Que Resolve
-**"Como posso treinar de forma inteligente e estruturada, mesmo com pouco tempo disponível, sem risco de lesão e com segurança de progresso?"**
+Corredores amadores e iniciantes que desejam treinar de forma estruturada, bem como estudantes e profissionais que buscam otimizar tempo de treino com suporte científico.
 
----
+## Funcionalidades Principais
 
-## 💡 Proposta da Solução
+- Cadastro e autenticação de usuários com JWT
+- Criação de perfil do corredor (objetivo, nível, dias disponíveis)
+- Geração automática de planos de treino periodizados
+- Suporte a objetivos de 5K, 10K e Meia Maratona
+- Registro de execução das sessões
+- Dashboard com acompanhamento de progresso
+- Interface responsiva e intuitiva
 
-**Corrida Treino** oferece uma plataforma **fullstack e integrada** que:
+## Tecnologias Utilizadas
 
-1. ✅ **Coleta perfil do corredor** (objetivo, nível, dias disponíveis)
-2. ✅ **Gera planos personalizados** com 4 fases periodizadas (Base → Desenvolvimento → Pico → Taper)
-3. ✅ **Registra execução** e acompanha progresso
-4. ✅ **Visualiza dados** com gráficos e análises
-5. ✅ **Oferece segurança** com autenticação JWT
-6. ✅ **Funciona em qualquer dispositivo** com frontend responsivo
+**Backend:**
+- Java 21
+- Spring Boot 3.4.3
+- Spring Security + JWT
+- Spring Data JPA + Hibernate
+- PostgreSQL
+- Maven
 
-A solução **elimina a paralisia de decisão**, oferecendo estrutura científica, acompanhamento visual e resgate rápido de dados históricos.
+**Frontend:**
+- React 19.2.4
+- React Router DOM 7.13.1
+- Axios 1.13.6
+- Chart.js 4.5.1
 
----
+## Instruções de Instalação
 
-## 📋 Sobre o Projeto
+### Pré-requisitos
 
----
+- Java 21
+- Node.js 18+
+- PostgreSQL 15+
+- Git
 
-## ✨ Funcionalidades
+### Backend
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/Bruno-Kowalski/corrida-treino.git
+cd corrida-treino
+```
+
+2. Crie o banco de dados PostgreSQL:
+```sql
+CREATE DATABASE corrida_treino;
+```
+
+3. Configure as credenciais em `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/corrida_treino
+spring.datasource.username=postgres
+spring.datasource.password=sua_senha
+```
+
+4. Instale as dependências:
+```bash
+mvn clean install
+```
+
+### Frontend
+
+1. Instale as dependências:
+```bash
+cd corrida-treino-frontend
+npm install
+```
+
+2. Configure a URL da API em `.env`:
+```env
+REACT_APP_API_URL=http://localhost:8080/api
+```
+
+## Instruções de Execução
+
+### Executar Backend
+
+```bash
+mvn spring-boot:run
+```
+
+O backend estará disponível em: `http://localhost:8080/api`
+
+### Executar Frontend
+
+```bash
+cd corrida-treino-frontend
+npm start
+```
+
+O frontend estará disponível em: `http://localhost:3000`
+
+## Instruções para Rodar os Testes
+
+### Testes Backend
+
+```bash
+mvn test
+```
+
+Testes cobrem: autenticação JWT, validação de dados, criação de perfil, geração de plano e registro de execução.
+
+### Testes Frontend
+
+```bash
+cd corrida-treino-frontend
+npm test
+```
+
+Testes cobrem: renderização de componentes, autenticação, integração com API e validação de formulários.
+
+## Instruções para Rodar o Lint
+
+### Análise Estática Backend (Java)
+
+```bash
+# Checkstyle
+mvn checkstyle:check
+
+# SpotBugs
+mvn spotbugs:check
+```
+
+### Análise Estática Frontend (JavaScript)
+
+```bash
+cd corrida-treino-frontend
+
+# ESLint
+npm run lint
+
+# Aplicar correções automáticas
+npm run lint -- --fix
+```
+
+## Versão Atual
+
+**1.0.0**
+
+## Autor
+
+Bruno Silva
+
+## Repositório Público
+
+https://github.com/Bruno-Kowalski/corrida-treino
 
 ### 🔐 Autenticação & Segurança
 - ✅ Cadastro e login de usuários com autenticação JWT
@@ -579,17 +686,10 @@ server.port=8081
 ### Padrões de Código
 - Java: Siga convenções Spring Boot
 - React: Use functional components e hooks
-- Commits: Use mensagens em inglês descritivas
+- Commits: Use mensagens descritivas
 
 ---
 
-## 📞 Suporte
-
-Tem uma pergunta ou encontrou um bug? 
-- Abra uma [Issue](https://github.com/seu_usuario/corrida-treino/issues)
-- Leia o [Wiki](https://github.com/seu_usuario/corrida-treino/wiki)
-
----
 
 ## 📄 Licença
 
@@ -599,10 +699,10 @@ Este projeto está licenciado sob a **Licença MIT** - veja [LICENSE](LICENSE) p
 
 ## 👤 Autor & Informações do Projeto
 
-**Autor:** Bruno Silva  
-**Disciplina:** Engenharia de Software  
+**Autor:** Bruno Santos
+**Disciplina:** Bootcamp ll
 **Versão:** 1.0.0  
-**Data de Criação:** 2026-03-29  
+**Data de Criação:** 2026-03-22
 
 ---
 
@@ -616,16 +716,6 @@ Este projeto está licenciado sob a **Licença MIT** - veja [LICENSE](LICENSE) p
 
 ---
 
-## 🙏 Agradecimentos
-
-- Spring Boot Team - Framework backend
-- React Community - Biblioteca frontend
-- Chart.js - Visualização de dados
-- Comunidade de corredores 🏃‍♂️
-
----
-
-**Desenvolvido com ❤️ para corredores que querem treinar com inteligência**
 
 4. Execute o projeto
 ```bash

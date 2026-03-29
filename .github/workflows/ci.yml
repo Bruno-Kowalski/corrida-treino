@@ -26,18 +26,23 @@ jobs:
         run: java -version
 
       - name: Executar Checkstyle (Linting)
+        working-directory: ./backend
         run: mvn checkstyle:check
 
       - name: Executar SpotBugs (Bug Detection)
+        working-directory: ./backend
         run: mvn spotbugs:check
 
       - name: Executar testes
+        working-directory: ./backend
         run: mvn test -DskipTests=false
 
       - name: Build do projeto
+        working-directory: ./backend
         run: mvn package -DskipTests
 
       - name: Gerar relatório de cobertura
+        working-directory: ./backend
         run: mvn jacoco:report
         continue-on-error: true
 
@@ -57,30 +62,30 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: corrida-treino-frontend/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Display Node version
         run: node --version && npm --version
 
       - name: Instalar dependências
-        working-directory: ./corrida-treino-frontend
+        working-directory: ./frontend
         run: npm ci
 
       - name: Executar ESLint (Linting)
-        working-directory: ./corrida-treino-frontend
+        working-directory: ./frontend
         run: npm run lint
         continue-on-error: true
 
       - name: Executar testes
-        working-directory: ./corrida-treino-frontend
+        working-directory: ./frontend
         run: npm test -- --coverage --watchAll=false --passWithNoTests
 
       - name: Build produção
-        working-directory: ./corrida-treino-frontend
+        working-directory: ./frontend
         run: npm run build
 
       - name: Verificar tamanho do build
-        working-directory: ./corrida-treino-frontend
+        working-directory: ./frontend
         run: du -sh build/
 
   quality-gate:
