@@ -18,11 +18,34 @@ import java.util.List;
 @Service
 public class PeriodizacaoService {
 
-    // Etapa 1: calcular número de semanas
+    private static final int MINIMO_DIAS_TREINO = 3;
+    private static final int MINIMO_SEMANAS_PLANO = 4;
+
+    // ── Validações ────────────────────────────────────────────────────────────
+
+    private void validarDiasDisponiveis(List<DiaSemana> diasDisponiveis) {
+        if (diasDisponiveis == null || diasDisponiveis.size() < MINIMO_DIAS_TREINO) {
+            throw new IllegalArgumentException(
+                    "Você deve ter no mínimo 3 dias disponíveis para treinar.");
+        }
+    }
+
+    private void validarDataProva(LocalDate dataProva) {
+        long semanasAteProva = ChronoUnit.WEEKS.between(LocalDate.now(), dataProva);
+        if (semanasAteProva < MINIMO_SEMANAS_PLANO) {
+            throw new IllegalArgumentException(
+                    "Data da prova muito próxima, impossível gerar um plano de treinamento.");
+        }
+    }
+
+    // ── Etapa 1: calcular número de semanas ───────────────────────────────────
+
     public int calcularSemanas(LocalDate dataProva, ObjetivoCorrida objetivo) {
         int semanasRestantes = (int) ChronoUnit.WEEKS.between(LocalDate.now(), dataProva);
         int minimoSemanas = minimoSemanas(objetivo);
-        return Math.max(semanasRestantes, minimoSemanas);
+        // Respeita exatamente o que o usuário tem disponível;
+        // usa o mínimo do objetivo apenas se restar mais tempo do que ele.
+        return Math.min(semanasRestantes, Math.max(semanasRestantes, minimoSemanas));
     }
 
     private int minimoSemanas(ObjetivoCorrida objetivo) {
@@ -33,7 +56,8 @@ public class PeriodizacaoService {
         };
     }
 
-    // Etapa 2: volume base semanal em km
+    // ── Etapa 2: volume base semanal em km ────────────────────────────────────
+
     private double volumeBase(ObjetivoCorrida objetivo, NivelExperiencia nivel) {
         return switch (objetivo) {
             case CINCO_KM -> switch (nivel) {
@@ -54,16 +78,19 @@ public class PeriodizacaoService {
         };
     }
 
-    // Etapa 3: definir fase de cada semana
+    // ── Etapa 3: definir fase de cada semana ─────────────────────────────────
+
     private FaseTreino definirFase(int numeroSemana, int totalSemanas) {
         double progresso = (double) numeroSemana / totalSemanas;
-        if (progresso <= 0.40) return FaseTreino.BASE;
-        if (progresso <= 0.70) return FaseTreino.DESENVOLVIMENTO;
-        if (progresso <= 0.90) return FaseTreino.PICO;
+        if (progresso <= 0.40)
+            return FaseTreino.BASE;
+        if (progresso <= 0.70)
+            return FaseTreino.DESENVOLVIMENTO;
+        if (progresso <= 0.90)
+            return FaseTreino.PICO;
         return FaseTreino.TAPER;
     }
 
-    // Multiplicador de volume por fase
     private double multiplicadorFase(FaseTreino fase, int numeroSemana, int totalSemanas) {
         return switch (fase) {
             case BASE -> 1.0 + (numeroSemana - 1) * 0.08;
@@ -73,14 +100,14 @@ public class PeriodizacaoService {
         };
     }
 
-    // Etapa 4: distribuir sessões por dias disponíveis
+    // ── Etapa 4: distribuir sessões por dias disponíveis ─────────────────────
+
     private List<SessaoTreino> distribuirSessoes(List<DiaSemana> diasDisponiveis,
-                                                 FaseTreino fase,
-                                                 double volumeSemana,
-                                                 int paceMedioSegundos) {
+            FaseTreino fase,
+            double volumeSemana,
+            int paceMedioSegundos) {
         List<SessaoTreino> sessoes = new ArrayList<>();
         int numDias = diasDisponiveis.size();
-
         List<TipoSessao> tipos = definirTiposPorDias(numDias, fase);
 
         for (int i = 0; i < Math.min(numDias, tipos.size()); i++) {
@@ -93,7 +120,6 @@ public class PeriodizacaoService {
             sessao.setDistanciaKm(calcularDistancia(tipo, volumeSemana, numDias));
             sessao.setPaceAlvo(calcularPaceAlvo(tipo, paceMedioSegundos));
             sessao.setDescricao(gerarDescricao(tipo));
-
             sessoes.add(sessao);
         }
 
@@ -121,7 +147,8 @@ public class PeriodizacaoService {
         return tipos;
     }
 
-    // Etapa 5: calcular pace alvo por tipo de sessão
+    // ── Etapa 5: calcular pace alvo por tipo de sessão ───────────────────────
+
     private String calcularPaceAlvo(TipoSessao tipo, int paceMedioSegundos) {
         int paceAjustado = switch (tipo) {
             case RECUPERACAO -> paceMedioSegundos + 60;
@@ -153,14 +180,19 @@ public class PeriodizacaoService {
         };
     }
 
-    // Método principal: gera o plano completo
-    public PlanoTreino gerarPlano(ObjetivoCorrida objetivo,
-                                  NivelExperiencia nivel,
-                                  LocalDate dataProva,
-                                  int paceMedioSegundos,
-                                  List<DiaSemana> diasDisponiveis) {
+    // ── Método principal ──────────────────────────────────────────────────────
 
-        int totalSemanas = calcularSemanas(dataProva, objetivo);
+    public PlanoTreino gerarPlano(ObjetivoCorrida objetivo,
+            NivelExperiencia nivel,
+            LocalDate dataProva,
+            int paceMedioSegundos,
+            List<DiaSemana> diasDisponiveis) {
+
+        validarDiasDisponiveis(diasDisponiveis);
+        validarDataProva(dataProva);
+
+        // Usa exatamente as semanas que o usuário tem até a prova
+        int totalSemanas = (int) ChronoUnit.WEEKS.between(LocalDate.now(), dataProva);
         double volumeBase = volumeBase(objetivo, nivel);
 
         PlanoTreino plano = new PlanoTreino();
