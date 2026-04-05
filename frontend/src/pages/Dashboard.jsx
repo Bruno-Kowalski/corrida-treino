@@ -101,9 +101,13 @@ function StatCard({ label, value, sub }) {
 }
 
 // ── SessaoCard com status dinâmico ──────────────────────────────────────────
-function SessaoCard({ sessao, registro, isPast, onRegistrar }) {
+function SessaoCard({ sessao, registro, isPast, dataSessao, onRegistrar }) {
   const [hovered, setHovered] = useState(false);
   const cor = TIPO_COR[sessao.tipo] || "#FF4500";
+
+  const dataFormatada = dataSessao
+    ? dataSessao.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+    : null;
 
   // Determina o estado do botão
   const statusBotao = () => {
@@ -135,7 +139,7 @@ function SessaoCard({ sessao, registro, isPast, onRegistrar }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12, gap: 16 }}>
         <div style={{ minWidth: 0 }}>
           <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: cor, textTransform: "uppercase", letterSpacing: "0.12em" }}>
-            {DIA_LABEL[sessao.diaSemana]} · {TIPO_LABEL[sessao.tipo]}
+            {DIA_LABEL[sessao.diaSemana]}{dataFormatada ? ` ${dataFormatada}` : ""} · {TIPO_LABEL[sessao.tipo]}
           </span>
           <div style={{ fontSize: 15, color: "#F0F4FF", fontWeight: 500, marginTop: 8, lineHeight: 1.5 }}>{sessao.descricao}</div>
         </div>
@@ -531,28 +535,34 @@ export default function Dashboard() {
                       gridTemplateColumns: `repeat(${Math.min(semanaAtiva.sessoes?.length || 1, 3)}, 1fr)`,
                       borderTop: "1px solid rgba(255,255,255,0.06)",
                     }}>
-                      {semanaAtiva.sessoes?.map((sessao, i) => {
-                        const registro = registroDaSessao(sessao.id);
-                        const dataSessao = calcularDataSessao(
-                          planoAtivo.geradoEm,
-                          semanaAtiva.numeroSemana,
-                          sessao.diaSemana
-                        );
-                        const isPast = dataSessao < hoje;
+                      {[...(semanaAtiva.sessoes ?? [])]
+                        .map(sessao => ({
+                          sessao,
+                          dataSessao: calcularDataSessao(
+                            planoAtivo.geradoEm,
+                            semanaAtiva.numeroSemana,
+                            sessao.diaSemana
+                          ),
+                        }))
+                        .sort((a, b) => a.dataSessao - b.dataSessao)
+                        .map(({ sessao, dataSessao }, i) => {
+                          const registro = registroDaSessao(sessao.id);
+                          const isPast = dataSessao < hoje;
 
-                        return (
-                          <div key={sessao.id} style={{
-                            borderRight: i < (semanaAtiva.sessoes.length - 1) ? "1px solid rgba(255,255,255,0.06)" : "none",
-                          }}>
-                            <SessaoCard
-                              sessao={sessao}
-                              registro={registro}
-                              isPast={isPast}
-                              onRegistrar={abrirModal}
-                            />
-                          </div>
-                        );
-                      })}
+                          return (
+                            <div key={sessao.id} style={{
+                              borderRight: i < (semanaAtiva.sessoes.length - 1) ? "1px solid rgba(255,255,255,0.06)" : "none",
+                            }}>
+                              <SessaoCard
+                                sessao={sessao}
+                                registro={registro}
+                                isPast={isPast}
+                                dataSessao={dataSessao}
+                                onRegistrar={abrirModal}
+                              />
+                            </div>
+                          );
+                        })}
                     </div>
                   </div>
                 )}

@@ -49,7 +49,7 @@ export default function Perfil() {
   useEffect(() => {
     api.get("/perfil")
       .then(() => navigate("/dashboard"))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const toggleDia = (dia) => {
