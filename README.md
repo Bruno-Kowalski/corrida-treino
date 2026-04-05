@@ -2,13 +2,13 @@
 
 > Plataforma inteligente de treinamento para corredores que oferece planos de treino personalizados baseados em periodização científica, eliminando a paralisia de decisão e estruturando treinos com segurança.
 
-[![Versão](https://img.shields.io/badge/Vers%C3%A3o-1.0.0-blue)](https://github.com/seu_usuario/pacex/releases/tag/1.0.0)
+[![Versão](https://img.shields.io/badge/Vers%C3%A3o-1.0.0-blue)](https://github.com/Bruno-Kowalski/pacex/releases/tag/1.0.0)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-green)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-21%20LTS-blue)](https://www.oracle.com/java/technologies/downloads/#java21)
 [![React](https://img.shields.io/badge/React-19.2.4-61DAFB?logo=react)](https://react.dev)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![Node](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](https://github.com/seu_usuario/pacex/actions)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](https://github.com/Bruno-Kowalski/pacex/actions)
 
 ---
 
@@ -591,8 +591,8 @@ Este projeto está licenciado sob a **MIT License**. Veja [LICENSE](LICENSE) par
 - 🏠 [Repositório GitHub](https://github.com/Bruno-Kowalski/PaceX)
 - 📚 [Documentação de Arquitetura](docs/architecture.md)
 - 📋 [Requisitos Funcionais](docs/requirements.md)
-- 🚀 [Releases & Tags](https://github.com/seu_usuario/pacex/releases)
-- 🆘 [Reportar Issues](https://github.com/seu_usuario/pacex/issues)
+- 🚀 [Releases & Tags](https://github.com/Bruno-Kowalski/pacex/releases)
+- 🆘 [Reportar Issues](https://github.com/Bruno-Kowalski/pacex/issues)
 
 ---
 
@@ -616,7 +616,7 @@ Este projeto foi desenvolvido como parte de uma **atividade de Bootcamp no curso
 Tem dúvidas ou encontrou um bug? 
 
 1. **Verifique a seção Troubleshooting** acima
-2. **Abra uma Issue** em https://github.com/seu_usuario/pacex/issues
+2. **Abra uma Issue** em https://github.com/Bruno-Kowalski/pacex/issues
 3. **Consulte a documentação** em `/docs`
 
 ---
