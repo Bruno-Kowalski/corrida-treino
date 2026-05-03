@@ -3,6 +3,7 @@ package com.corridaapp.corridatreino.entity;
 import com.corridaapp.corridatreino.enums.DiaSemana;
 import com.corridaapp.corridatreino.enums.NivelExperiencia;
 import com.corridaapp.corridatreino.enums.ObjetivoCorrida;
+
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -34,7 +35,7 @@ public class PerfilCorredor {
     @Column(name = "data_prova")
     private LocalDate dataProva;
 
-    @ElementCollection(targetClass = DiaSemana.class)
+    @ElementCollection(targetClass = DiaSemana.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "perfil_dias_disponiveis", joinColumns = @JoinColumn(name = "perfil_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "dia")

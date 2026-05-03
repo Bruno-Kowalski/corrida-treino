@@ -20,6 +20,7 @@ public class PeriodizacaoService {
 
     private static final int MINIMO_DIAS_TREINO = 3;
     private static final int MINIMO_SEMANAS_PLANO = 4;
+    private static final int MAXIMO_SEMANAS_PLANO = 24;
 
     // ── Validações ────────────────────────────────────────────────────────────
 
@@ -35,6 +36,10 @@ public class PeriodizacaoService {
         if (semanasAteProva < MINIMO_SEMANAS_PLANO) {
             throw new IllegalArgumentException(
                     "Data da prova muito próxima, impossível gerar um plano de treinamento.");
+        }
+        if (semanasAteProva > MAXIMO_SEMANAS_PLANO) {
+            throw new IllegalArgumentException(
+                    "Não é possível gerar o plano: a data da prova excede o limite de 24 semanas.");
         }
     }
 

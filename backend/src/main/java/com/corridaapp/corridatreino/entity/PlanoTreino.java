@@ -28,7 +28,7 @@ public class PlanoTreino {
     @Column(name = "gerado_em")
     private LocalDateTime geradoEm;
 
-    @OneToMany(mappedBy = "plano", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "plano", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<SemanaTreino> semanas;
 

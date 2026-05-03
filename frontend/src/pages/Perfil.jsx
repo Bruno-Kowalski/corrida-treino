@@ -32,6 +32,12 @@ function dataMinima() {
   return d.toISOString().split("T")[0];
 }
 
+function dataMaxima() {
+  const d = new Date();
+  d.setDate(d.getDate() + 24 * 7);
+  return d.toISOString().split("T")[0];
+}
+
 export default function Perfil() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -96,7 +102,8 @@ export default function Perfil() {
     }
   };
 
-  const dataValida = () => !!dataProva && dataProva >= dataMinima();
+  const dataValida = () =>
+  !!dataProva && dataProva >= dataMinima() && dataProva <= dataMaxima();
 
   const podeAvancar = () => {
     if (etapa === 1) return !!nivel;
@@ -273,13 +280,14 @@ export default function Perfil() {
                 value={dataProva}
                 onChange={e => setDataProva(e.target.value)}
                 min={dataMinima()} // bloqueia datas com menos de 4 semanas no picker
+                max={dataMaxima()} // bloqueia datas com mais de 24 semanas no picker
                 style={{ width: "100%", padding: "14px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, color: "#F0F4FF", fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none", caretColor: "#FF4500", colorScheme: "dark" }}
                 onFocus={e => e.target.style.borderColor = "#FF4500"}
                 onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"}
               />
               {dataProva && !dataValida() ? (
                 <p style={{ fontSize: 12, color: "#FF4500", marginTop: 8 }}>
-                  ⚠ Data muito próxima — escolha uma data com pelo menos 4 semanas a partir de hoje.
+                  ⚠ Data inválida — escolha uma data entre 4 e 24 semanas a partir de hoje.
                 </p>
               ) : (
                 <p style={{ fontSize: 12, color: "#7A869A", marginTop: 8 }}>
