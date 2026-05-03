@@ -15,8 +15,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      console.warn('Sessão expirada ou usuário apagado do banco. Deslogando...');
+    const isAuthRoute = error.config?.url?.includes('/auth/');
+    if (error.response?.status === 401 && !isAuthRoute) {
+      console.warn('Sessão expirada. Deslogando...');
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
