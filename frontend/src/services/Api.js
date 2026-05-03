@@ -1,10 +1,9 @@
 ﻿import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080',
+  baseURL: 'https://pacex-api.onrender.com',
 });
 
-// Interceptor da IDA: Adiciona o token JWT em todas as requisições
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -13,7 +12,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor da VOLTA: Vigia as respostas do backend
 api.interceptors.response.use(
   (response) => response,
   (error) => {
