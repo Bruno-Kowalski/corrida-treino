@@ -2,14 +2,29 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop, entrega-intermediaria]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   build-backend:
     name: Backend Build & Tests
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: db_pacex
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 22501077
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout código
@@ -18,16 +33,20 @@ jobs:
       - name: Configurar JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
           cache: maven
-          # Ajustado para o caminho correto do seu pom.xml
           cache-dependency-path: backend/pom.xml
 
       - name: Instalar e Testar Backend
         working-directory: ./backend
-        # Rodar checkstyle e testes em um comando otimiza o tempo de inicialização do Maven
         run: mvn clean install -DskipTests=false
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/db_pacex
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: 22501077
+          JWT_SECRET: 3cF7gK9mN2pQ5rT8vX1yA4bD6eH0jL3nP6qS9uW2zA5cE8fI1kM4oR7tV0xY3z
+          JWT_EXPIRATION: 86400000
 
       - name: Gerar relatório de cobertura
         working-directory: ./backend
@@ -46,7 +65,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Instalar dependências
@@ -66,10 +85,9 @@ jobs:
 
       - name: Build produção
         working-directory: ./frontend
-        # O CI: false aqui impede que Warnings travem o deploy
         run: npm run build
         env:
-          CI: false 
+          CI: false
 
       - name: Verificar tamanho do build
         working-directory: ./frontend
