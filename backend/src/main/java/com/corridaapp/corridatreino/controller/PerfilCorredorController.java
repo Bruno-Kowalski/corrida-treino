@@ -24,14 +24,19 @@ public class PerfilCorredorController {
     }
 
     @PostMapping
-    public ResponseEntity<PerfilCorredor> salvarPerfil(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody PerfilCorredorRequest request) {
+    public ResponseEntity<PerfilCorredor> salvarPerfil(@AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody PerfilCorredorRequest request) {
         PerfilCorredor perfil = perfilCorredorService.salvarPerfil(userDetails.getUsername(), request);
         return ResponseEntity.ok(perfil);
     }
 
     @GetMapping
     public ResponseEntity<PerfilCorredor> buscarPerfil(@AuthenticationPrincipal UserDetails userDetails) {
-        PerfilCorredor perfil = perfilCorredorService.buscarPerfil(userDetails.getUsername());
-        return ResponseEntity.ok(perfil);
+        try {
+            PerfilCorredor perfil = perfilCorredorService.buscarPerfil(userDetails.getUsername());
+            return ResponseEntity.ok(perfil);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

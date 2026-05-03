@@ -17,13 +17,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify({ nome, email: userEmail }));
     setUser({ nome, email: userEmail });
 
-    // Verifica se já tem perfil
-    try {
-      await api.get('/perfil');
-      return { temPerfil: true };
-    } catch {
-      return { temPerfil: false };
-    }
+    return { temPerfil: true };
   };
 
   const register = async (nome, email, senha) => {
@@ -34,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify({ nome: userName, email: userEmail }));
     setUser({ nome: userName, email: userEmail });
 
-    return { temPerfil: false }; // novo usuário nunca tem perfil
+    return { temPerfil: false };
   };
 
   const logout = () => {

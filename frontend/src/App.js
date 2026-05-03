@@ -5,7 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Perfil from "./pages/Perfil";
 import Dashboard from "./pages/Dashboard";
-
+import ExecucaoTreino from './pages/ExecucaoTreino';
 
 export default function App() {
   return (
@@ -17,6 +17,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/perfil-setup" element={<Perfil />} />
+          <Route path="/execucao-treino" element={<ExecucaoTreino />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

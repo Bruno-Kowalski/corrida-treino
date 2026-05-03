@@ -75,4 +75,33 @@ export const registrosService = {
     const { data } = await api.post(`/registros/sessao/${sessaoId}`, dados);
     return data;
   },
+
+};
+
+// ──────────────────────────────────────
+// WORKOUT GPS
+// ──────────────────────────────────────
+export const workoutService = {
+  iniciar: async (lat, lng, intervaloSegmentosMetros = 1000) => {
+    const { data } = await api.post('/api/workouts/iniciar', {
+      lat,
+      lng,
+      intervaloSegmentosMetros,
+    });
+    return data;
+  },
+
+  adicionarPontos: async (workoutId, pontos) => {
+    await api.post(`/api/workouts/${workoutId}/pontos`, pontos);
+  },
+
+  finalizar: async (workoutId) => {
+    const { data } = await api.post(`/api/workouts/${workoutId}/finalizar`);
+    return data;
+  },
+
+  listar: async () => {
+    const { data } = await api.get('/api/workouts');
+    return data;
+  },
 };

@@ -15,23 +15,19 @@ api.interceptors.request.use((config) => {
 
 // Interceptor da VOLTA: Vigia as respostas do backend
 api.interceptors.response.use(
-  (response) => {
-    // Se deu tudo certo, só repassa a resposta para frente
-    return response;
-  },
+  (response) => response,
   (error) => {
-    // Se o backend avisar que deu erro 401 (Não Autorizado)
     if (error.response && error.response.status === 401) {
-      console.warn('Sessão expirada ou usuário apagado do banco. Deslogando...');
-      
-      // Limpa o token "morto" do navegador
-      localStorage.removeItem('token');
-      
-      // Redireciona o usuário para a tela de login (ajuste a rota se a sua for diferente)
-      window.location.href = '/login';
+      const url = error.config?.url || '';
+      const isAuthRoute = url.includes('/auth/login') || url.includes('/auth/register');
+
+      if (!isAuthRoute) {
+        console.warn('Sessão expirada ou usuário apagado do banco. Deslogando...');
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
-    
-    // Repassa o erro para que o seu componente React possa tratá-lo se quiser
+
     return Promise.reject(error);
   }
 );

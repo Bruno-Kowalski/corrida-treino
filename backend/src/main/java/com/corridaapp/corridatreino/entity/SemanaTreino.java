@@ -30,7 +30,7 @@ public class SemanaTreino {
     @Column(name = "volume_total_km")
     private Double volumeTotalKm;
 
-    @OneToMany(mappedBy = "semana", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "semana", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<SessaoTreino> sessoes;
 
