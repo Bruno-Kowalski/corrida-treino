@@ -1,7 +1,7 @@
 ﻿import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080',
 });
 
 // Interceptor da IDA: Adiciona o token JWT em todas as requisições
@@ -18,16 +18,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      const url = error.config?.url || '';
-      const isAuthRoute = url.includes('/auth/login') || url.includes('/auth/register');
-
-      if (!isAuthRoute) {
-        console.warn('Sessão expirada ou usuário apagado do banco. Deslogando...');
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
+      console.warn('Sessão expirada ou usuário apagado do banco. Deslogando...');
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
-
     return Promise.reject(error);
   }
 );
