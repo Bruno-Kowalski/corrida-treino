@@ -1,8 +1,8 @@
-﻿import api from './Api'; // ← seu axios original
+﻿import api from './Api'; 
 
-// ──────────────────────────────────────
+
 // AUTH
-// ──────────────────────────────────────
+
 export const authService = {
   login: async (email, senha) => {
     const { data } = await api.post('/auth/login', { email, senha });
@@ -22,9 +22,9 @@ export const authService = {
   isLoggedIn: () => !!localStorage.getItem('token'),
 };
 
-// ──────────────────────────────────────
+
 // PERFIL
-// ──────────────────────────────────────
+
 export const perfilService = {
   buscar: async () => {
     const { data } = await api.get('/perfil');
@@ -37,9 +37,9 @@ export const perfilService = {
   },
 };
 
-// ──────────────────────────────────────
+
 // PLANOS DE TREINO
-// ──────────────────────────────────────
+
 export const planosService = {
   listar: async () => {
     const { data } = await api.get('/planos');
@@ -62,9 +62,9 @@ export const planosService = {
   },
 };
 
-// ──────────────────────────────────────
+
 // REGISTROS DE TREINO
-// ──────────────────────────────────────
+
 export const registrosService = {
   listar: async () => {
     const { data } = await api.get('/registros');
@@ -78,9 +78,8 @@ export const registrosService = {
 
 };
 
-// ──────────────────────────────────────
 // WORKOUT GPS
-// ──────────────────────────────────────
+
 export const workoutService = {
   iniciar: async (lat, lng, intervaloSegmentosMetros = 1000) => {
     const { data } = await api.post('/api/workouts/iniciar', {
