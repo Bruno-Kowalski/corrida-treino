@@ -11,6 +11,11 @@ import {
 import '../styles/execucao-treino.css';
 
 const POSICAO_INICIAL = [-15.7942, -47.8825];
+const GPS_MAX_ACCURACY_M = 35;
+const GPS_MIN_DELTA_M = 2;
+const GPS_MAX_RUNNING_SPEED_MS = 8;
+const GPS_MAX_INTERVAL_MS = 15000;
+const DISTANCIA_MINIMA_PACE_M = 100;
 
 function calcDistancia(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -33,9 +38,21 @@ function formatTempo(ms) {
 
 function formatPace(segPorKm) {
   if (!segPorKm || segPorKm <= 0 || !isFinite(segPorKm)) return '--:--';
-  const m = Math.floor(segPorKm / 60);
-  const s = Math.round(segPorKm % 60);
+  const totalSegundos = Math.round(segPorKm);
+  const m = Math.floor(totalSegundos / 60);
+  const s = totalSegundos % 60;
   return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function isCoordenadaValida(latitude, longitude) {
+  return (
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude) &&
+    latitude >= -90 &&
+    latitude <= 90 &&
+    longitude >= -180 &&
+    longitude <= 180
+  );
 }
 
 function getTurno() {
@@ -137,8 +154,10 @@ export default function ExecucaoTreino() {
     const elapsed = Date.now() - startTimeRef.current - pausedAccRef.current;
     setElapsedMs(elapsed);
     setDistanciaM((prev) => {
-      if (prev > 0 && elapsed > 0) {
+      if (prev >= DISTANCIA_MINIMA_PACE_M && elapsed > 0) {
         setRitmoMedioSeg(elapsed / 1000 / (prev / 1000));
+      } else {
+        setRitmoMedioSeg(0);
       }
       return prev;
     });
@@ -195,7 +214,42 @@ export default function ExecucaoTreino() {
 
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
-        const { latitude, longitude, altitude, speed } = pos.coords;
+        const { latitude, longitude, altitude, accuracy, speed } = pos.coords;
+        const registradoEm = pos.timestamp || Date.now();
+
+        if (!isCoordenadaValida(latitude, longitude)) return;
+        if (accuracy && accuracy > GPS_MAX_ACCURACY_M) return;
+
+        let deltaAceito = 0;
+        let velocidadeReferencia = 0;
+
+        if (lastPosRef.current) {
+          const deltaTempoMs = registradoEm - lastPosRef.current.timestamp;
+          const delta = calcDistancia(
+            lastPosRef.current.latitude,
+            lastPosRef.current.longitude,
+            latitude,
+            longitude
+          );
+          const velocidadeCalculada = deltaTempoMs > 0 ? delta / (deltaTempoMs / 1000) : 0;
+          const velocidadeGps = typeof speed === 'number' && speed >= 0 ? speed : null;
+          velocidadeReferencia = Math.max(velocidadeCalculada, velocidadeGps ?? 0);
+
+          if (deltaTempoMs > GPS_MAX_INTERVAL_MS) {
+            lastPosRef.current = { latitude, longitude, timestamp: registradoEm };
+            return;
+          }
+
+          if (
+            deltaTempoMs <= 0 ||
+            delta < GPS_MIN_DELTA_M ||
+            velocidadeReferencia > GPS_MAX_RUNNING_SPEED_MS
+          ) {
+            return;
+          }
+
+          deltaAceito = delta;
+        }
 
         // Atualiza mapa
         if (leafletMapRef.current) {
@@ -229,25 +283,17 @@ export default function ExecucaoTreino() {
         }
 
         // Distância
-        if (lastPosRef.current) {
-          const delta = calcDistancia(
-            lastPosRef.current[0],
-            lastPosRef.current[1],
-            latitude,
-            longitude
-          );
-          if (delta < 50) {
-            setDistanciaM((prev) => {
-              const nova = prev + delta;
-              if (speed && speed > 0.5) {
-                const paceAtual = 1000 / speed;
-                gerarFeedback(nova, paceAtual);
-              }
-              return nova;
-            });
-          }
+        if (lastPosRef.current && deltaAceito > 0) {
+          setDistanciaM((prev) => {
+            const nova = prev + deltaAceito;
+            if (velocidadeReferencia > 0.5) {
+              const paceAtual = 1000 / velocidadeReferencia;
+              gerarFeedback(nova, paceAtual);
+            }
+            return nova;
+          });
         }
-        lastPosRef.current = [latitude, longitude];
+        lastPosRef.current = { latitude, longitude, timestamp: registradoEm };
 
         // Elevação
         if (altitude !== null) {
@@ -262,11 +308,11 @@ export default function ExecucaoTreino() {
           lat: latitude,
           lng: longitude,
           altitudeM: altitude ?? null,
-          registradoEm: new Date().toISOString(),
+          registradoEm: new Date(registradoEm).toISOString(),
         });
       },
       (err) => console.warn('GPS:', err.message),
-      { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
     );
   }, [gerarFeedback]);
 
@@ -297,6 +343,16 @@ export default function ExecucaoTreino() {
       setWorkoutId(data.workoutId);
       startTimeRef.current = Date.now();
       pausedAccRef.current = 0;
+      pauseStartRef.current = null;
+      lastPosRef.current = null;
+      lastAltRef.current = null;
+      elevGainRef.current = 0;
+      maxElevRef.current = 0;
+      pontosBufferRef.current = [];
+      setElapsedMs(0);
+      setDistanciaM(0);
+      setRitmoMedioSeg(0);
+      setRota([]);
       setEstado(ESTADO.RUNNING);
       rafRef.current = requestAnimationFrame(tick);
       iniciarGPS();
@@ -325,6 +381,8 @@ export default function ExecucaoTreino() {
     }
     setEstado(ESTADO.RUNNING);
     setShowPauseModal(false);
+    lastPosRef.current = null;
+    lastAltRef.current = null;
     rafRef.current = requestAnimationFrame(tick);
     iniciarGPS();
     iniciarEnvioPontos(workoutId);
